@@ -10,6 +10,13 @@ public class TurnController { //Class for performing actions during players turn
         this.board = board;
     } //Constructor
 
+    public void exchangeResources(Player player, Build build) {
+        for (Resource resource : build.getRequiredResources().keySet()) {
+            player.updateResources(resource, -1, board);
+//            board.updateResources(resource, 1);
+        }
+    }
+
     public boolean handleBuildSettlement(Player player, Node node, int turn) { //Building settlements
         if (turn <= 2) { //If starting phase
             if (!rules.canPlaceSettlement(player, node, board)) { //If player cannot place Settlement
@@ -26,15 +33,7 @@ public class TurnController { //Class for performing actions during players turn
         node.setOwner(player); //Sets nodes owner to player
 
         if (turn > 2) { //If turn > 2 update resources
-            player.updateResources(Resource.BRICK, -1);
-            player.updateResources(Resource.WOOD, -1);
-            player.updateResources(Resource.SHEEP, -1);
-            player.updateResources(Resource.WHEAT, -1);
-
-            board.updateResources(Resource.BRICK, 1);
-            board.updateResources(Resource.WOOD, 1);
-            board.updateResources(Resource.SHEEP, 1);
-            board.updateResources(Resource.WHEAT, 1);
+            exchangeResources(player, settlement);
         }
         return true;
     }
@@ -48,10 +47,7 @@ public class TurnController { //Class for performing actions during players turn
             player.addCity(node);
             player.removeSettlement(node); //Remove settlement location
 
-            player.updateResources(Resource.ORE, -3); //Update values
-            player.updateResources(Resource.WHEAT, -1);
-            board.updateResources(Resource.ORE, 3);
-            board.updateResources(Resource.WHEAT, 2);
+            exchangeResources(player, city);
             return true;
         }
         return false;
@@ -73,10 +69,7 @@ public class TurnController { //Class for performing actions during players turn
         board.addRoad(road);
 
         if (turn > 2) { //If turn > 2, update resources
-            player.updateResources(Resource.BRICK, -1);
-            player.updateResources(Resource.WOOD, -1);
-            board.updateResources(Resource.BRICK, 1);
-            board.updateResources(Resource.WOOD, 1);
+            exchangeResources(player, road);
         }
         return true;
     }

@@ -28,6 +28,12 @@ public class Player {
         resources.put(resource, amount + change);
     }
 
+    public void updateResources(Resource resource, int change, Board board) { //Updates resources
+        int amount = resources.get(resource);
+        resources.put(resource, amount + change);
+        board.updateResources(resource, -change);
+    }
+
     public List<Building> getBuildings() {
         return buildings;
     } //Gets buildings

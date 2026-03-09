@@ -8,9 +8,9 @@ public class Gameplay { //Class for running gameflow
     private int turn = 0; //Current turn
     private int maxTurns; //Max turns
 
-    public Gameplay () { //Constructor
+    public Gameplay (int maxTurns) { //Constructor
         this.board = new Board();
-        this.maxTurns = Integer.parseInt(System.getenv("turns"));
+        this.maxTurns = maxTurns;
         Player player1 = new Player(1, board);
         Player player2 = new Player(2, board);
         Player player3 = new Player(3, board);
@@ -66,22 +66,23 @@ public class Gameplay { //Class for running gameflow
     }
 
     private Node chooseNode() { //Chooses random node
-        int counter = 0;
-        while (true) { //While loop to choose node
-            counter += 1;
-            int node = rand.nextInt(54); //Number from 0 to 53
-            int tileCount = board.getNodes(node).getTileSize();
-            if (tileCount == 3) { //Prioritizes nodes connected to 3 tiles
-                return board.getNodes(node);
-            }
-            else if (counter >= 5 && tileCount == 2) { //Chooses nodes with lower tile count over time
-                return board.getNodes(node);
-            }
-            else if (counter >= 10 && tileCount == 1) {
-                return board.getNodes(node);
-            }
-
-        }
+        int node = rand.nextInt(54); //Number from 0 to 53
+        return board.getNodes(node);
+//        int counter = 0;
+//        while (true) { //While loop to choose node
+//            counter += 1;
+//            int node = rand.nextInt(54); //Number from 0 to 53
+//            int tileCount = board.getNodes(node).getTileSize();
+//            if (tileCount == 3) { //Prioritizes nodes connected to 3 tiles
+//                return board.getNodes(node);
+//            }
+//            else if (counter >= 5 && tileCount == 2) { //Chooses nodes with lower tile count over time
+//                return board.getNodes(node);
+//            }
+//            else if (counter >= 10 && tileCount == 1) {
+//                return board.getNodes(node);
+//            }
+//        }
     }
 
     private Node chooseAdjacentNode(Node node) { //Chooses random adjacent node
@@ -109,7 +110,7 @@ public class Gameplay { //Class for running gameflow
     private void roundOne() { //First round
         for (Player player: players) { //For each player
             if (player instanceof HumanPlayer) {
-                commandLine(player);
+                commandLine(player, true);
             }
             else {
                 while (true) {
@@ -133,12 +134,18 @@ public class Gameplay { //Class for running gameflow
     private void roundTwo() { //Second round
         for (int i=players.size()-1;i>=0;i--) { //Players play in reverse order
             if (players.get(i) instanceof HumanPlayer) {
-                commandLine(players.get(i));
+                commandLine(players.get(i), true);
             }
             else {
                 while (true) {
                     Node node = chooseNode(); //Chooses random node
                     if (board.placeSettlement(players.get(i), node) == true) { //If player places settlement
+                        for (Tile tile: board.getTiles()) {
+                            if (tile.getNodes().contains(node) && tile.getResource() != null) {
+                                players.get(i).updateResources(tile.getResource(), 1, board);
+                            }
+
+                        }
                         while (true) {
                             Node end = chooseAdjacentNode(node); //Chooses adjacent node
                             if (board.placeRoad(players.get(i), node, end) == true) { //If player places road
@@ -156,7 +163,7 @@ public class Gameplay { //Class for running gameflow
 
     private boolean playRound(Player player) { //Method for playing rounds
         if (player instanceof HumanPlayer) {
-            commandLine(player);
+            commandLine(player, false);
         }
         else {
             System.out.print(player.getPlayerNumber() + ": "); //Prints player
@@ -282,7 +289,6 @@ public class Gameplay { //Class for running gameflow
     }
 
     public void activateRobber(Player player) {
-        System.out.println("\nThe robber has been activated!");
         Resource resource = null;
         for (Player p : players) {
             if (p != player) {
@@ -313,7 +319,7 @@ public class Gameplay { //Class for running gameflow
                 int currentResources = robbedPlayer.getTotalResources();
                 while (robbedPlayer.getTotalResources() == currentResources) {
                     resource = chooseResource(robbedPlayer);
-                    System.out.print("Player " + robbedPlayer.getPlayerNumber() + " has been robbed! (-1 " + resource + ")");
+                    System.out.print(" Player " + robbedPlayer.getPlayerNumber() + " has been robbed! (-1 " + resource + ")");
                     robbedPlayer.updateResources(resource, -1);
                     player.updateResources(resource, 1);
                 }
@@ -339,21 +345,21 @@ public class Gameplay { //Class for running gameflow
         return tile;
     }
 
-    public void commandLine(Player player) {
+    public void commandLine(Player player, boolean startingRound) {
         boolean rolled = false;
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter command: ");
         while (true) {
             String command = scan.next();
             if (command.equals("Go")) {
-                if (rolled == false) {
+                if (rolled == false && startingRound == false) {
                     System.out.println("Haven't rolled yet");
                 }
                 else {
                     break;
                 }
             }
-            else if (command.equals("Roll") && rolled == false) {
+            else if (command.equals("Roll") && rolled == false && startingRound == false) {
                 makeResources(rollDice(), player);
                 rolled = true;
                 System.out.println();

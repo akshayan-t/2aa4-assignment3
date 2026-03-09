@@ -1,9 +1,25 @@
+import java.io.IOException;
 import java.util.*;
 
 public class Demonstrator { //Main class
+    private ReadConfig readConfig = new ReadConfig();
+    private int turns = 0;
+
+    public Demonstrator() {
+        try {
+            turns = readConfig.readTurns();
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid number format in file.");
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     public void testOne() { //Testing building and wins
         System.out.println("Test One");
-        int turns = Integer.parseInt(System.getenv("turns")); //Gets turns
+//        int turns = readConfig.readTurns(); //Gets turns
         Board board = new Board(); //Makes new board
         Player player1 = new Player(1, board); //Makes player for testing
 
@@ -74,7 +90,7 @@ public class Demonstrator { //Main class
     public void testThree() { //Tests roads and longest road
         System.out.println("\nTest Three");
         System.out.println();
-        int turns = Integer.parseInt(System.getenv("turns"));
+//        int turns = Integer.parseInt(System.getenv("turns"));
         Board board = new Board();
         Player player1 = new Player(1, board);
         Player player2 = new Player(2, board);
@@ -119,13 +135,13 @@ public class Demonstrator { //Main class
 
     public void playGame() { //Runs game
         System.out.println("\nTest Gameplay");
-        Gameplay play = new Gameplay(); //Shows how game should be run without testing or creating players or board beforehand
+        Gameplay play = new Gameplay(turns); //Shows how game should be run without testing or creating players or board beforehand
         play.runGame();
     }
 
     public void testRobber() {
         System.out.println("Testing Robber");
-        int turns = Integer.parseInt(System.getenv("turns"));
+//        int turns = Integer.parseInt(System.getenv("turns"));
         Board board = new Board(); //Makes new board
         Player player1 = new Player(1, board);
         Player player2 = new Player(2, board);
@@ -141,18 +157,24 @@ public class Demonstrator { //Main class
             player.updateResources(Resource.SHEEP, 2);
             player.updateResources(Resource.ORE, 3);
         }
+        board.placeSettlement(player2, 17);
+        board.placeSettlement(player2, 21);
+        board.placeSettlement(player2, 22);
+        board.placeSettlement(player2, 7);
+        board.placeSettlement(player2, 10);
+        board.placeSettlement(player3, 13);
+        board.placeSettlement(player3, 0);
 //        player1.printResources();
 //        player2.printResources();
 //        player3.printResources();
 //        player4.printResources();
-        board.printResources();
-        System.out.println("Robert has been activated!");
+//        board.printResources();
         play.activateRobber(player1);
-        player1.printResources();
-        player2.printResources();
-        player3.printResources();
-        player4.printResources();
-        board.printResources();
+//        player1.printResources();
+//        player2.printResources();
+//        player3.printResources();
+//        player4.printResources();
+//        board.printResources();
     }
 
     public static void main(String[] args) { //Main method for testing

@@ -13,10 +13,10 @@ public class Tile {
         this.nodeLocations = new ArrayList<>(nodeLocations);
     } //Constructor
 
-    public void setNodeTiles(Board board) { //Sets node tiles
+    public void setNodes(Board board) { //Sets node tiles
         for (int position: nodeLocations) {
             nodes.add(board.getNodes(position));
-            board.getNodes(position).addTile(this);
+//            board.getNodes(position).addTile(this);
         }
     }
 

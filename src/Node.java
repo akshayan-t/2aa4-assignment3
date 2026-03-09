@@ -7,18 +7,18 @@ public class Node { //Node class
     private Player owner; //Owner
     private List<Road> roads = new ArrayList<>(); //Road list
     private List<Integer> adjacentNodes = new ArrayList<>(); //Adjacent node list
-    private List<Tile> tiles = new ArrayList<>(); //Tile list
+//    private List<Tile> tiles = new ArrayList<>(); //Tile list
 
     public Node(List<Integer> adjacentNodes) {
         this.adjacentNodes = new ArrayList<>(adjacentNodes);
     } //Constructor
 
-    public void addTile(Tile tile) {
-        tiles.add(tile);
-    } //Adds tile to connected tile list
-    public int getTileSize() {
-        return tiles.size();
-    } //Gets number of tiles node is connected to
+//    public void addTile(Tile tile) {
+//        tiles.add(tile);
+//    } //Adds tile to connected tile list
+//    public int getTileSize() {
+//        return tiles.size();
+//    } //Gets number of tiles node is connected to
     public void setNumber(int number) {
         this.number = number;
     } //Sets node number

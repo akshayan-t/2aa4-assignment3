@@ -20,7 +20,7 @@ public class Board { //Class to act as board for game
         this.nodes = setup.getNodes();
 
         for (int i = 0; i < tiles.length; i++) {
-            this.tiles[i].setNodeTiles(this); //Sets up all tiles with this as board
+            this.tiles[i].setNodes(this); //Sets up all tiles with this as board
         }
 
         resources.put(Resource.WOOD, 19); //Initializes resources
