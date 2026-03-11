@@ -11,7 +11,7 @@ public class JsonExporter {
             throw new RuntimeException("Failed to write JSON file: " + filename, e);
         }
     }
-
+ 
     public static String toJson(Gameplay gameplay) {
         Board board = gameplay.getBoard();
 

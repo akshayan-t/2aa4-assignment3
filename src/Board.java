@@ -10,7 +10,7 @@ public class Board { //Class to act as board for game
     private List<Road> roads = new ArrayList<>(); //Road list
     private int turn = 0; //Turn counter
     private TurnController turnController;
-
+ 
     private Player longestRoad = null; //Longest road owner
     private int longestRoadLength = 0; //Longest road length
 

@@ -19,7 +19,7 @@ public class Player {
         resources.put(Resource.SHEEP, 0);
         resources.put(Resource.ORE, 0);
     }
-
+ 
     public Player (int playerNumber, Board board, PlayerColour colour) {
         this(playerNumber, board);
         this.colour = colour;
