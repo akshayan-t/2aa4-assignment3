@@ -9,6 +9,7 @@ public class Player {
     private List<Node> cities = new ArrayList<>();
     private List<Road> roads = new ArrayList<>();
     private List<Building> buildings = new ArrayList<>();
+    private PlayerColour colour;
 
     public Player(int playerNumber, Board board) { //Constructor
         this.playerNumber = playerNumber;
@@ -17,6 +18,11 @@ public class Player {
         resources.put(Resource.WHEAT, 0);
         resources.put(Resource.SHEEP, 0);
         resources.put(Resource.ORE, 0);
+    }
+
+    public Player (int playerNumber, Board board, PlayerColour colour) {
+        this(playerNumber, board);
+        this.colour = colour;
     }
 
     public int getResources(Resource resource) {

@@ -1,5 +1,7 @@
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Gameplay { //Class for running gameflow
     private SecureRandom rand = new SecureRandom();
@@ -7,21 +9,24 @@ public class Gameplay { //Class for running gameflow
     private List<Player> players = new ArrayList<>(); //List for players
     private int turn = 0; //Current turn
     private int maxTurns; //Max turns
+    private TurnController turnController;
 
     public Gameplay (int maxTurns) { //Constructor
         this.board = new Board();
         this.maxTurns = maxTurns;
-        Player player1 = new Player(1, board);
-        Player player2 = new Player(2, board);
-        Player player3 = new Player(3, board);
-        Player player4 = new Player(4, board);
+        Player player1 = new HumanPlayer(1, board, PlayerColour.RED);
+        Player player2 = new Player(2, board, PlayerColour.BLUE);
+        Player player3 = new Player(3, board, PlayerColour.GREEN);
+        Player player4 = new Player(4, board, PlayerColour.ORANGE);
         this.players = new ArrayList<>(Arrays.asList(player1, player2, player3, player4));
+        this.turnController = new TurnController(board);
     }
 
     public Gameplay (int maxTurns, List<Player> players, Board board) { //Constructor for testing with customizable options
         this.board = board;
         this.maxTurns = maxTurns;
         this.players = players;
+        this.turnController = new TurnController(board);
     }
 
     public void runGame() { //Gameflow
@@ -110,7 +115,7 @@ public class Gameplay { //Class for running gameflow
     private void roundOne() { //First round
         for (Player player: players) { //For each player
             if (player instanceof HumanPlayer) {
-                commandLine(player, true);
+                commandLineSetup(player);
             }
             else {
                 while (true) {
@@ -134,7 +139,14 @@ public class Gameplay { //Class for running gameflow
     private void roundTwo() { //Second round
         for (int i=players.size()-1;i>=0;i--) { //Players play in reverse order
             if (players.get(i) instanceof HumanPlayer) {
-                commandLine(players.get(i), true);
+                commandLineSetup(players.get(i));
+                for (Tile tile: board.getTiles()) {
+                    for (Node node: tile.getNodes()) {
+                        if (node.getOwner() == players.get(i) && tile.getResource() != null) {
+                            players.get(i).updateResources(tile.getResource(), 1, board);
+                        }
+                    }
+                }
             }
             else {
                 while (true) {
@@ -144,7 +156,6 @@ public class Gameplay { //Class for running gameflow
                             if (tile.getNodes().contains(node) && tile.getResource() != null) {
                                 players.get(i).updateResources(tile.getResource(), 1, board);
                             }
-
                         }
                         while (true) {
                             Node end = chooseAdjacentNode(node); //Chooses adjacent node
@@ -163,11 +174,11 @@ public class Gameplay { //Class for running gameflow
 
     private boolean playRound(Player player) { //Method for playing rounds
         if (player instanceof HumanPlayer) {
-            commandLine(player, false);
+            commandLine(player);
         }
         else {
             System.out.print(player.getPlayerNumber() + ": "); //Prints player
-            makeResources(rollDice(), player); //Generates resources
+            turnController.makeResources(rollDice(), player, players); //Generates resources
             int action = -100; //Sets action out of bounds
             ArrayList<Node> settlementNodes = getSettlementNodes(player); //Gets settlement nodes
             ArrayList<Node> roadNodes = getRoadNodes(player); //Gets road nodes
@@ -228,42 +239,42 @@ public class Gameplay { //Class for running gameflow
         return isGameOver(player); //Checks if player wins
     }
 
-    private void makeResources(int number, Player player) {
-        System.out.print("Rolled " + number);
-        int total;
-        Player owner1 = null;
-        Player owner2 = null;
-        switch (number) {
-            case 6:
-                owner1 = board.getTiles()[8].getOwner(); //If both tiles make same resource
-                owner2 = board.getTiles()[10].getOwner(); //Gets tiles owners
-                total = board.getTiles()[8].getResourcesProduced() + board.getTiles()[10].getResourcesProduced(); //Checks if total would overflow
-                if (board.checkResources(Resource.ORE, -total) || (owner1 == owner2) || owner1 == null || owner2 == null) { //If tiles have same owner or none
-                    board.getTiles()[8].makeResources(board); //ore
-                    board.getTiles()[10].makeResources(board); //ore
-                }
-                break;
-            case 7: //desert, no resources produced
-                activateRobber(player);
-                break;
-            case 8:
-                owner1 = board.getTiles()[2].getOwner();
-                owner2 = board.getTiles()[14].getOwner();
-                total = board.getTiles()[2].getResourcesProduced() + board.getTiles()[14].getResourcesProduced();
-                if (board.checkResources(Resource.BRICK, -total) || (owner1 == owner2) || owner1 == null || owner2 == null) {
-                    board.getTiles()[2].makeResources(board); //brick
-                    board.getTiles()[14].makeResources(board); //brick
-                }
-                total = 0;
-                break;
-            default:
-                for (Tile tile : board.getTiles()) { //Produces resources for each tile that matches number
-                    if (number == tile.getNumber()) {
-                        tile.makeResources(board);
-                    }
-                }
-        }
-    }
+//    private void makeResources(int number, Player player) {
+//        System.out.print("Rolled " + number);
+//        int total;
+//        Player owner1 = null;
+//        Player owner2 = null;
+//        switch (number) {
+//            case 6:
+//                owner1 = board.getTiles()[8].getOwner(); //If both tiles make same resource
+//                owner2 = board.getTiles()[10].getOwner(); //Gets tiles owners
+//                total = board.getTiles()[8].getResourcesProduced() + board.getTiles()[10].getResourcesProduced(); //Checks if total would overflow
+//                if (board.checkResources(Resource.ORE, -total) || (owner1 == owner2) || owner1 == null || owner2 == null) { //If tiles have same owner or none
+//                    board.getTiles()[8].makeResources(board); //ore
+//                    board.getTiles()[10].makeResources(board); //ore
+//                }
+//                break;
+//            case 7: //desert, no resources produced
+//                activateRobber(player);
+//                break;
+//            case 8:
+//                owner1 = board.getTiles()[2].getOwner();
+//                owner2 = board.getTiles()[14].getOwner();
+//                total = board.getTiles()[2].getResourcesProduced() + board.getTiles()[14].getResourcesProduced();
+//                if (board.checkResources(Resource.BRICK, -total) || (owner1 == owner2) || owner1 == null || owner2 == null) {
+//                    board.getTiles()[2].makeResources(board); //brick
+//                    board.getTiles()[14].makeResources(board); //brick
+//                }
+//                total = 0;
+//                break;
+//            default:
+//                for (Tile tile : board.getTiles()) { //Produces resources for each tile that matches number
+//                    if (number == tile.getNumber()) {
+//                        tile.makeResources(board);
+//                    }
+//                }
+//        }
+//    }
 
     public void printPoints() { //Prints points
         System.out.print("Victory points: ");
@@ -288,114 +299,170 @@ public class Gameplay { //Class for running gameflow
         return false;
     }
 
-    public void activateRobber(Player player) {
-        Resource resource = null;
-        for (Player p : players) {
-            if (p != player) {
-                if (p.getTotalResources() > 7) {
-                    int newTotal = p.getTotalResources()/2;
-                    while (p.getTotalResources() > newTotal) {
-                        resource = chooseResource(p);
-                        p.updateResources(resource, -1);
-                        board.updateResources(resource, 1);
-                    }
-                }
-            }
-        }
-        Tile tile = chooseTile();
-        List<Player> owners = new ArrayList<>(tile.getOwners());
-        owners.remove(player);
-        owners.remove(null);
-        Iterator<Player> iterator = owners.iterator();
-        while (iterator.hasNext()) {
-            Player p = iterator.next();
-            if (p.getTotalResources() <= 0) {
-                iterator.remove();
-            }
-        }
-        if (owners.size() > 0) {
-            Player robbedPlayer = owners.get(rand.nextInt(owners.size()));
-            if (robbedPlayer != null) {
-                int currentResources = robbedPlayer.getTotalResources();
-                while (robbedPlayer.getTotalResources() == currentResources) {
-                    resource = chooseResource(robbedPlayer);
-                    System.out.print(" Player " + robbedPlayer.getPlayerNumber() + " has been robbed! (-1 " + resource + ")");
-                    robbedPlayer.updateResources(resource, -1);
-                    player.updateResources(resource, 1);
-                }
-            }
-        }
-    }
+//    public void activateRobber(Player player) {
+//        Resource resource = null;
+//        for (Player p : players) {
+//            if (p != player) {
+//                if (p.getTotalResources() > 7) {
+//                    int newTotal = p.getTotalResources()/2;
+//                    while (p.getTotalResources() > newTotal) {
+//                        resource = chooseResource(p);
+//                        p.updateResources(resource, -1);
+//                        board.updateResources(resource, 1);
+//                    }
+//                }
+//            }
+//        }
+//        Tile tile = chooseTile();
+//        List<Player> owners = new ArrayList<>(tile.getOwners());
+//        owners.remove(player);
+//        owners.remove(null);
+//        Iterator<Player> iterator = owners.iterator();
+//        while (iterator.hasNext()) {
+//            Player p = iterator.next();
+//            if (p.getTotalResources() <= 0) {
+//                iterator.remove();
+//            }
+//        }
+//        if (owners.size() > 0) {
+//            Player robbedPlayer = owners.get(rand.nextInt(owners.size()));
+//            if (robbedPlayer != null) {
+//                int currentResources = robbedPlayer.getTotalResources();
+//                while (robbedPlayer.getTotalResources() == currentResources) {
+//                    resource = chooseResource(robbedPlayer);
+//                    System.out.print(" Player " + robbedPlayer.getPlayerNumber() + " has been robbed! (-1 " + resource + ")");
+//                    robbedPlayer.updateResources(resource, -1);
+//                    player.updateResources(resource, 1);
+//                }
+//            }
+//        }
+//    }
+//
+//    public Resource chooseResource(Player player) {
+//        Resource[] resources = Resource.values();
+//        Resource resource = null;
+//        while (true) {
+//            resource = resources[rand.nextInt(resources.length)];
+//            if (player.getResources(resource) > 0) {
+//                break;
+//            }
+//        }
+//        return resource;
+//    }
+//
+//    public Tile chooseTile() {
+//        Tile[] tiles = board.getTiles();
+//        Tile tile = tiles[rand.nextInt(tiles.length)];
+//        return tile;
+//    }
 
-    public Resource chooseResource(Player player) {
-        Resource[] resources = Resource.values();
-        Resource resource = null;
-        while (true) {
-            resource = resources[rand.nextInt(resources.length)];
-            if (player.getResources(resource) > 0) {
-                break;
-            }
-        }
-        return resource;
-    }
-
-    public Tile chooseTile() {
-        Tile[] tiles = board.getTiles();
-        Tile tile = tiles[rand.nextInt(tiles.length)];
-        return tile;
-    }
-
-    public void commandLine(Player player, boolean startingRound) {
+    public void commandLine(Player player) {
+        String regex = "^(?<command>Roll|Go|List|Build (?<building>settlement|city|road (?<fromNodeId>(\\d+,))?)? (?<nodeId>\\d+))?$";
+        Pattern pattern = Pattern.compile(regex);
         boolean rolled = false;
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter command: ");
         while (true) {
-            String command = scan.next();
-            if (command.equals("Go")) {
-                if (rolled == false && startingRound == false) {
-                    System.out.println("Haven't rolled yet");
-                }
-                else {
-                    break;
-                }
-            }
-            else if (command.equals("Roll") && rolled == false && startingRound == false) {
-                makeResources(rollDice(), player);
-                rolled = true;
-                System.out.println();
-            }
-            else if (command.equals("List")) {
-                player.printCards(board);
-            }
-            else if (command.equals("Build")) {
-                if (scan.next().equals("settlement")) {
-                    if (scan.hasNextInt()) {
-                        int node = scan.nextInt();
-                        if (board.placeSettlement(player, node)) {
-                            System.out.println("Built settlement at node " + node);
-                        }
+            String command = scan.nextLine();
+            Matcher matcher = pattern.matcher(command);
+            if (matcher.matches()) {
+                String line[] = command.split(" ");
+                if (rolled == false) {
+                    if (line[0].equals("Roll")) {
+                        turnController.makeResources(rollDice(), player, players);
+                        rolled = true;
+                        System.out.println();
+                    } else {
+                        System.out.println("Roll before continuing");
                     }
-                }
-                if (scan.next().equals("city")) {
-                    if (scan.hasNextInt()) {
-                        int node = scan.nextInt();
-                        if (board.upgradeCity(player, node)) {
-                            System.out.println("Upgraded city at node " + node);
-                        }
-                    }
-
-                }
-                if (scan.next().equals("road")) {
-                    if (scan.hasNextInt()) {
-                        int start = scan.nextInt();
-                        if (scan.hasNextInt()) {
-                            int end = scan.nextInt();
+                } else {
+                    if (line[0].equals("Roll")) {
+                        System.out.println("Already rolled");
+                    } else if (line[0].equals("Go")) {
+                        break;
+                    } else if (line[0].equals("List")) {
+                        player.printCards(board);
+                    } else if (line[0].equals("Build")) {
+                        if (line[1].equals("settlement")) {
+                            int node = Integer.parseInt(line[2]);
+                            if (board.placeSettlement(player, node)) {
+                                System.out.println("Built settlement at node " + node);
+                            }
+                        } else if (line[1].equals("city")) {
+                            int node = Integer.parseInt(line[2]);
+                            if (board.upgradeCity(player, node)) {
+                                System.out.println("Upgraded city at node " + node);
+                            }
+                        } else if (line[1].equals("road")) {
+                            int start = Integer.valueOf(line[2].replace(",", ""));
+                            int end = Integer.valueOf(line[3]);
                             if (board.placeRoad(player, start, end)) {
                                 System.out.println("Built road at (" + start + ", " + end + ")");
                             }
                         }
                     }
                 }
+            }
+            else {
+                System.out.println("Usage string: Roll|Go|List|[Build [settlement [nodeId] | city [nodeId] | road [fromNodeId, toNodeId]]]");
+            }
+        }
+    }
+
+    public void commandLineSetup (Player player) {
+        String regex = "^(?<command>Roll|Go|List|Build (?<building>settlement|city|road (?<fromNodeId>(\\d+,))?)? (?<nodeId>\\d+))?$";
+        Pattern pattern = Pattern.compile(regex);
+        String command = null;
+        boolean builtSettlement = false;
+        boolean builtRoad = false;
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter command: ");
+        while (true) {
+            command = scan.nextLine();
+            Matcher matcher = pattern.matcher(command);
+            if (matcher.matches()) {
+                String line[] = command.split(" ");
+                if (line[0].equals("Go")) {
+                    if (builtSettlement == true && builtRoad == true) {
+                        break;
+                    }
+                    else {
+                        System.out.println("Must finish building before proceeding");
+                    }
+                }
+                else if (line[0].equals("Roll")) {
+                    System.out.println("Can't roll during the first 2 turns");
+                }
+                else if (line[0].equals("List")) {
+                    player.printCards(board);
+                }
+                else if (line[0].equals("Build")) {
+                    if (line[1].equals("settlement")) {
+                        if (builtSettlement == false) {
+                            int node = Integer.parseInt(line[2]);
+                            if (board.placeSettlement(player, node)) {
+                                System.out.println("Built settlement at node " + node);
+                                builtSettlement = true;
+                                continue;
+                            }
+                        }
+                    }
+                    else if (line[1].equals("road")) {
+                        if (builtSettlement == true && builtRoad == false) {
+                            int start = Integer.valueOf(line[2].replace(",", ""));
+                            int end = Integer.valueOf(line[3]);
+                            if (board.placeRoad(player, start, end)) {
+                                System.out.println("Built road at (" + start + ", " + end + ")");
+                                builtRoad = true;
+                                continue;
+                            }
+                        }
+                    }
+                    System.out.println("Build unsuccessful");
+                }
+            }
+            else {
+                System.out.println("Usage string: Roll|Go|List|[Build [settlement [nodeId] | city [nodeId] | road [fromNodeId, toNodeId]]]");
             }
         }
     }

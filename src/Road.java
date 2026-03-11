@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Road extends Build { //Road class
+public class Road extends Buildable { //Road class
     private Node start; //Start and end nodes
     private Node end;
     private Player owner; //Road owner
@@ -11,13 +11,13 @@ public class Road extends Build { //Road class
         this.end = end;
         this.owner = owner;
 
-        resources.put(Resource.BRICK, 1);
-        resources.put(Resource.WOOD, 1);
+        cost.put(Resource.BRICK, 1);
+        cost.put(Resource.WOOD, 1);
     }
 
     @Override
-    public HashMap<Resource, Integer> getRequiredResources() {
-        return resources;
+    public HashMap<Resource, Integer> getCost() {
+        return cost;
     }
 
     public Node getStart() { //Gets start

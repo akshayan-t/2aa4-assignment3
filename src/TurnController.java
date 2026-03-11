@@ -5,13 +5,14 @@ public class TurnController { //Class for performing actions during players turn
     private Board board; //Private board
     private PlacementRules rules = new PlacementRules(); //Private rules
     private SecureRandom rand = new SecureRandom();
+    private RobberController robberController = new RobberController();
 
     public TurnController(Board board) {
         this.board = board;
     } //Constructor
 
-    public void exchangeResources(Player player, Build build) {
-        for (Resource resource : build.getRequiredResources().keySet()) {
+    public void exchangeResources(Player player, Buildable build) {
+        for (Resource resource : build.getCost().keySet()) {
             player.updateResources(resource, -1, board);
 //            board.updateResources(resource, 1);
         }
@@ -148,6 +149,47 @@ public class TurnController { //Class for performing actions during players turn
             }
         }
         return max; //return max length
+    }
+
+    public void makeResources(int number, Player player, List<Player> players) {
+        System.out.print("Rolled " + number);
+        int total;
+        Player owner1 = null;
+        Player owner2 = null;
+        switch (number) {
+            case 6:
+                owner1 = board.getTiles()[8].getOwner(); //If both tiles make same resource
+                owner2 = board.getTiles()[10].getOwner(); //Gets tiles owners
+                total = board.getTiles()[8].getResourcesProduced() + board.getTiles()[10].getResourcesProduced(); //Checks if total would overflow
+                if (board.checkResources(Resource.ORE, -total) || (owner1 == owner2) || owner1 == null || owner2 == null) { //If tiles have same owner or none
+                    board.getTiles()[8].makeResources(board); //ore
+                    board.getTiles()[10].makeResources(board); //ore
+                }
+                break;
+            case 7: //desert, no resources produced
+                activateRobber(player, players);
+                break;
+            case 8:
+                owner1 = board.getTiles()[2].getOwner();
+                owner2 = board.getTiles()[14].getOwner();
+                total = board.getTiles()[2].getResourcesProduced() + board.getTiles()[14].getResourcesProduced();
+                if (board.checkResources(Resource.BRICK, -total) || (owner1 == owner2) || owner1 == null || owner2 == null) {
+                    board.getTiles()[2].makeResources(board); //brick
+                    board.getTiles()[14].makeResources(board); //brick
+                }
+                total = 0;
+                break;
+            default:
+                for (Tile tile : board.getTiles()) { //Produces resources for each tile that matches number
+                    if (number == tile.getNumber()) {
+                        tile.makeResources(board);
+                    }
+                }
+        }
+    }
+
+    public void activateRobber(Player player, List<Player> players) {
+        robberController.activateRobber(player, players, board);
     }
 
 }

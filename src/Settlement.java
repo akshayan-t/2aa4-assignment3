@@ -6,15 +6,15 @@ public class Settlement extends Building {
         this.owner = owner;
         this.location = node;
 
-        resources.put(Resource.BRICK, 1);
-        resources.put(Resource.WOOD, 1);
-        resources.put(Resource.SHEEP, 1);
-        resources.put(Resource.WHEAT, 1);
+        cost.put(Resource.BRICK, 1);
+        cost.put(Resource.WOOD, 1);
+        cost.put(Resource.SHEEP, 1);
+        cost.put(Resource.WHEAT, 1);
     }
 
     @Override
-    public HashMap<Resource, Integer> getRequiredResources() {
-        return resources;
+    public HashMap<Resource, Integer> getCost() {
+        return cost;
     }
 
     @Override

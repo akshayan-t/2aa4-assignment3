@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Demonstrator { //Main class
     private ReadConfig readConfig = new ReadConfig();
@@ -9,7 +11,7 @@ public class Demonstrator { //Main class
         try {
             turns = readConfig.readTurns();
         } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+            e.printStackTrace();
         } catch (NumberFormatException e) {
             System.err.println("Invalid number format in file.");
         } catch (IllegalArgumentException e) {
@@ -19,7 +21,6 @@ public class Demonstrator { //Main class
 
     public void testOne() { //Testing building and wins
         System.out.println("Test One");
-//        int turns = readConfig.readTurns(); //Gets turns
         Board board = new Board(); //Makes new board
         Player player1 = new Player(1, board); //Makes player for testing
 
@@ -90,7 +91,6 @@ public class Demonstrator { //Main class
     public void testThree() { //Tests roads and longest road
         System.out.println("\nTest Three");
         System.out.println();
-//        int turns = Integer.parseInt(System.getenv("turns"));
         Board board = new Board();
         Player player1 = new Player(1, board);
         Player player2 = new Player(2, board);
@@ -141,7 +141,6 @@ public class Demonstrator { //Main class
 
     public void testRobber() {
         System.out.println("Testing Robber");
-//        int turns = Integer.parseInt(System.getenv("turns"));
         Board board = new Board(); //Makes new board
         Player player1 = new Player(1, board);
         Player player2 = new Player(2, board);
@@ -150,6 +149,7 @@ public class Demonstrator { //Main class
 
         List<Player> players = new ArrayList<>(Arrays.asList(player1, player2, player3, player4));
         Gameplay play = new Gameplay(turns, players, board);
+        TurnController turnController = new TurnController(board);
         for (Player player: players) {
             player.updateResources(Resource.WOOD, 1); //Maxes player's resources
             player.updateResources(Resource.BRICK, 2);
@@ -164,26 +164,47 @@ public class Demonstrator { //Main class
         board.placeSettlement(player2, 10);
         board.placeSettlement(player3, 13);
         board.placeSettlement(player3, 0);
-//        player1.printResources();
-//        player2.printResources();
-//        player3.printResources();
-//        player4.printResources();
-//        board.printResources();
-        play.activateRobber(player1);
-//        player1.printResources();
-//        player2.printResources();
-//        player3.printResources();
-//        player4.printResources();
-//        board.printResources();
+        player1.printResources();
+        player2.printResources();
+        player3.printResources();
+        player4.printResources();
+        board.printResources();
+        turnController.activateRobber(player1, players);
+        player1.printResources();
+        player2.printResources();
+        player3.printResources();
+        player4.printResources();
+        board.printResources();
     }
+
+//    public void assignmentOneTests() {
+//        main.testOne();
+//        main.testTwo();
+//        main.testThree();
+//        main.testFour();
+//        main.playGame();
+//    }
 
     public static void main(String[] args) { //Main method for testing
         Demonstrator main = new Demonstrator();
-        main.testOne();
-        main.testTwo();
-        main.testThree();
-        main.testFour();
-        main.playGame();
         main.testRobber();
+//        String[] inputs = {"Roll", "Go", "List", "Build settlement 5", "Build road 1, 2", "Build city 1"};
+//        String regex = "^(?<command>Roll|Go|List|Build (?<building>settlement|city|road (?<fromNodeId>(\\d+,))?)? (?<nodeId>\\d+))?$";
+//        Pattern pattern = Pattern.compile(regex);
+//
+//        for (String input : inputs) {
+//            Matcher matcher = pattern.matcher(input);
+//            if (matcher.matches()) {
+//                if (matcher.group("building") == null) {
+//                    System.out.println("Roll");
+//                }
+//                String aaa[] = matcher.group("command").split(" ");
+//                System.out.println("Command: " + aaa[0]);
+//                System.out.println("Sub: " + matcher.group("building"));
+//                System.out.println("Args: " + matcher.group("nodeId"));
+//                System.out.println("Chunga: " + matcher.group("fromNodeId"));
+//                System.out.println("---");
+//            }
+//        }
     }
 }

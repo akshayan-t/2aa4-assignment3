@@ -1,4 +1,4 @@
-public abstract class Building extends Build { //Abstract building class
+public abstract class Building extends Buildable { //Abstract building class
     protected Node location;
 
     public abstract int getPoints(); //Gets points

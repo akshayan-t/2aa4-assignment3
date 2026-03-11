@@ -5,13 +5,13 @@ public class City extends Building { //City class
         this.owner = owner;
         this.location = node;
 
-        resources.put(Resource.ORE, 3);
-        resources.put(Resource.WHEAT, 2);
+        cost.put(Resource.ORE, 3);
+        cost.put(Resource.WHEAT, 2);
     }
 
     @Override
-    public HashMap<Resource, Integer> getRequiredResources() {
-        return resources;
+    public HashMap<Resource, Integer> getCost() {
+        return cost;
     }
 
     @Override
