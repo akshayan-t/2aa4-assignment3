@@ -463,7 +463,30 @@ public class Gameplay { //Class for running gameflow
             }
             else {
                 System.out.println("Usage string: Roll|Go|List|[Build [settlement [nodeId] | city [nodeId] | road [fromNodeId, toNodeId]]]");
+
+                
             }
         }
     }
+}
+
+public Board getBoard() {
+        return board;
+}
+
+public List<Player> getPlayers() {
+        return players;
+}
+
+public int getTurn() {
+        return turn;
+}
+
+public int getMaxTurns() {
+        return maxTurns;
+}
+
+public TurnController getTurnController() {
+        return turnController;
+}
 }
