@@ -34,32 +34,45 @@ public class Gameplay { //Class for running gameflow
             System.out.println("Error: Turns must be between 0 and 8192");
             return;
         }
+
         turn = 1;
         board.setTurn(turn);
+
         roundOne(); //Round 1
+        JsonExporter.export(this, "state.json");
         printPoints(); //Prints points
+
         if (maxTurns > 1) {
             turn++;
             board.setTurn(turn);
+
             roundTwo(); //Round 2
+            JsonExporter.export(this, "state.json");
             printPoints();
         }
+
         if (maxTurns > 2) {
             while (turn < maxTurns) { //Plays game until turn reaches max turns
                 turn++; //Increments turn each time
                 board.setTurn(turn); //Updates board's turn
+
                 for (Player player : players) { //For each player
                     System.out.print("Round " + turn + " / ");
                     if (playRound(player)) { //Plays round, if player wins
+                        JsonExporter.export(this, "state.json");
                         System.out.println();
                         System.out.println("Player " + player.getPlayerNumber() + " wins!");
                         printResults(); //Print win message and results
                         return;
                     }
+                    JsonExporter.export(this, "state.json");
                 }
+
                 printPoints(); //Prints points after each round
             }
         }
+
+        JsonExporter.export(this, "state.json");
         printResults(); //Prints results if nobody wins
     }
 
@@ -91,7 +104,7 @@ public class Gameplay { //Class for running gameflow
     }
 
     private Node chooseAdjacentNode(Node node) { //Chooses random adjacent node
-        ArrayList<Integer> nodeList = (ArrayList)node.getAdjacentNodes();
+        ArrayList<Integer> nodeList = (ArrayList<Integer>) node.getAdjacentNodes();
         int adjNode = nodeList.get(rand.nextInt(nodeList.size()));
         return board.getNodes(adjNode); //Returns adjacent node
     }
@@ -137,7 +150,7 @@ public class Gameplay { //Class for running gameflow
     }
 
     private void roundTwo() { //Second round
-        for (int i=players.size()-1;i>=0;i--) { //Players play in reverse order
+        for (int i = players.size() - 1; i >= 0; i--) { //Players play in reverse order
             if (players.get(i) instanceof HumanPlayer) {
                 commandLineSetup(players.get(i));
                 for (Tile tile: board.getTiles()) {
@@ -231,7 +244,6 @@ public class Gameplay { //Class for running gameflow
                         }
                     }
                 }
-
             }
         }
         board.calcLongestRoad(players); //Calculates longest road
@@ -463,30 +475,27 @@ public class Gameplay { //Class for running gameflow
             }
             else {
                 System.out.println("Usage string: Roll|Go|List|[Build [settlement [nodeId] | city [nodeId] | road [fromNodeId, toNodeId]]]");
-
-                
             }
         }
     }
-}
 
-public Board getBoard() {
+    public Board getBoard() {
         return board;
-}
+    }
 
-public List<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
-}
+    }
 
-public int getTurn() {
+    public int getTurn() {
         return turn;
-}
+    }
 
-public int getMaxTurns() {
+    public int getMaxTurns() {
         return maxTurns;
-}
+    }
 
-public TurnController getTurnController() {
+    public TurnController getTurnController() {
         return turnController;
-}
+    }
 }
