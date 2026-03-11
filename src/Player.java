@@ -151,7 +151,11 @@ public class Player {
 
     public HashMap<Resource, Integer> getResources() {
         return resources;
-}
+
+    public PlayerColour getColour() {
+        return colour;
+    }
+    }
 }
 
 
