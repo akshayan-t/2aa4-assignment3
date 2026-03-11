@@ -93,4 +93,4 @@ public class JsonExporter {
         }
         return building.getClass().getSimpleName().toUpperCase();
     }
-}
+} 
