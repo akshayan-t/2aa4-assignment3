@@ -47,8 +47,8 @@ public class Gameplay { //Class for running gameflow
     }
 
     public void runGame() { //Gameflow
-        if (maxTurns < 0 || maxTurns > 8192) { //If maxturns is valid
-            System.out.println("Error: Turns must be between 0 and 8192");
+        if (maxTurns <= 0 || maxTurns > 8192) { //If maxturns is valid
+            System.out.println("Error: Turns must be between 1 and 8192");
             return;
         }
         turn = 1;

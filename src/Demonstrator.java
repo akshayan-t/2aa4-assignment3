@@ -194,7 +194,7 @@ public class Demonstrator { //Main class
 //        main.testFour();
         main.playGame();
 //        main.testRobber();
-        //        String[] inputs = {"Roll", "Go", "List", "Build settlement 5", "Build road 1, 2", "Build city 1"};
+//        String[] inputs = {"Roll", "Go", "List", "Build settlement 5", "Build road 1, 2", "Build city 1"};
 //        String allInputs = String.join("\n", inputs);
 //        System.setIn(new ByteArrayInputStream(allInputs.getBytes()));
 //        String[] inputs = {"Roll", "Go", "List", "Build settlement 5", "Build road 1, 2", "Build city 1"};

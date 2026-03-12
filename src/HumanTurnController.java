@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class HumanTurnController extends PlayerTurnController {
-    private Scanner scan = new Scanner(System.in);
+    private ConsoleTextInputSource input = new ConsoleTextInputSource();
     private HumanCommandParser parser = new HumanCommandParser();
 
     public void takeTurn(Gameplay game, TurnController turnController) {
@@ -12,7 +12,7 @@ public class HumanTurnController extends PlayerTurnController {
             if (game.isGameOver(player)) {
                 return;
             }
-            String line = scan.nextLine();
+            String line = input.readLine();
             PlayerCommand command = parser.parse(line);
             if (command != null) {
                 if (rolled == false) {
@@ -51,7 +51,7 @@ public class HumanTurnController extends PlayerTurnController {
         boolean builtRoad = false;
         System.out.println("Enter command: ");
         while (true) {
-            line = scan.nextLine();
+            line = input.readLine();
             PlayerCommand command = parser.parse(line);
             if (command != null) {
                 String lines[] = line.split(" ");

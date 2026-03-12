@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     PlayerTest.class,
     PlacementRulesTest.class,
-    BoardTest.class
+    BoardTest.class,
 })
 
 
