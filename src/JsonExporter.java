@@ -90,7 +90,7 @@ public class JsonExporter {
             case ORANGE:
                 return "ORANGE";
             case GREEN:
-                return "GREEN";
+                return "WHITE";
             default:
                 return "WHITE";
         }
