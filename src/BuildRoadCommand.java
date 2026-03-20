@@ -3,6 +3,9 @@
 // --------------------------------------------------------
 
 /************************************************************/
+
+import java.util.List;
+
 /**
  * 
  */
@@ -16,6 +19,7 @@ public class BuildRoadCommand implements PlayerCommand {
 	 */
 	private int end;
 	private Player player;
+	private int cost = 2;
 
 	public BuildRoadCommand(int start, int end) {
 		this.start = start;
@@ -44,5 +48,24 @@ public class BuildRoadCommand implements PlayerCommand {
 		Node start = board.getNodes(this.start);
 		Node end = board.getNodes(this.end);
 		board.undoBuild(player, start, end);
+	}
+
+	public int getCost() {
+		return cost;
+	}
+
+	public boolean leadsToVictoryPoint(Gameplay game, TurnController turnController) {
+		Player player = game.getCurrentPlayer();
+		Board board = game.getBoard();
+		List<Player> players = game.getPlayers();
+		Node start = board.getNodes(this.start);
+		Node end = board.getNodes(this.end);
+
+		int oldPoints = player.calcPoints(players, board);
+		board.placeRoad(player, start, end);
+		int newPoints = player.calcPoints(players, board);
+		board.undoBuild(player, start, end);
+
+		return oldPoints < newPoints;
 	}
 }

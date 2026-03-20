@@ -12,6 +12,7 @@ public class BuildCityCommand implements PlayerCommand {
 	 */
 	private int nodeId;
 	private Player player;
+	private int cost = 5;
 
 	public BuildCityCommand(int nodeId) {
 		this.nodeId = nodeId;
@@ -39,5 +40,9 @@ public class BuildCityCommand implements PlayerCommand {
 		Board board = game.getBoard();
 		Node node = board.getNodes(nodeId);
 		board.undoBuild(player, node);
+	}
+
+	public int getCost() {
+		return cost;
 	}
 }

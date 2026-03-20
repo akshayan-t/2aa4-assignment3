@@ -88,39 +88,27 @@ public class TurnController { //Class for performing actions during players turn
         return true;
     }
 
-    public List<PlayerCommand> checkActions(Player player, List<Node> settlementNodes, List<Node> roadNodes) { //Check possible player actions
+    public List<PlayerCommand> getLegalActions(Player player, List<Node> settlementNodes, List<Node> roadNodes) { //Check possible player actions
         List<PlayerCommand> commands = new ArrayList<>();
-        boolean settlement = false; //Set booleans to represent actions
-        boolean city = false;
-        boolean road = false;
         while (settlementNodes.size() > 0) { //Checks if player can upgrade city at any node
             int random = rand.nextInt(settlementNodes.size());
             Node node = settlementNodes.get(random); //Choose random node from settlements
             settlementNodes.remove(random); //Removes node once checked
             if (rules.canUpgradeCity(player, node)) { //If true, city = true and break
-                city = true;
                 commands.add(new BuildCityCommand(node.getNumber()));
-                break;
             }
         }
         while (roadNodes.size() > 0) { //Checks every road node
             int random = rand.nextInt(roadNodes.size());
             Node node = roadNodes.get(random); //Chooses random node and removes it once checked
             roadNodes.remove(random);
-            if (rules.canBuildSettlement(player, node, board) && settlement == false) { //If player can build settlement
-                settlement = true;
+            if (rules.canBuildSettlement(player, node, board)) { //If player can build settlement
                 commands.add(new BuildSettlementCommand(node.getNumber()));
             }
-            if (road == false) {
-                for (int end : node.getAdjacentNodes()) { //If road not true yet, for every road
-                    if (rules.canBuildRoad(player, node, board.getNodes(end), board)) { //Checks if player can build road at connected node
-                        road = true;
-                        commands.add(new BuildRoadCommand(node.getNumber(), end));
-                    }
+            for (int end : node.getAdjacentNodes()) { //If road not true yet, for every road
+                if (rules.canBuildRoad(player, node, board.getNodes(end), board)) { //Checks if player can build road at connected node
+                    commands.add(new BuildRoadCommand(node.getNumber(), end));
                 }
-            }
-            if (settlement == true && road == true) { //If both settlement and road possible, breaks
-                break;
             }
         }
         return commands; //Returns list of booleans

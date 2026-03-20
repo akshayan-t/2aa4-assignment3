@@ -3,17 +3,14 @@ import java.util.Stack;
 public class CommandManager {
     private Stack<PlayerCommand> undoStack = new Stack<>();
     private Stack<PlayerCommand> redoStack = new Stack<>();
-    private Gameplay game;
-    private TurnController turnController;
 
-    public CommandManager(Gameplay game, TurnController turnController) {
-        this.game = game;
-        this.turnController = turnController;
-    }
-
-    public CommandResult executeCommand(PlayerCommand command) {
+    public CommandResult executeCommand(PlayerCommand command, Gameplay game, TurnController turnController) {
         CommandResult result = command.execute(game, turnController);
         if (command instanceof ListStatusCommand || command instanceof GoCommand || result == null) {
+            if (command instanceof GoCommand) {
+                undoStack.clear();
+                redoStack.clear();
+            }
             return result;
         }
         undoStack.push(command);
@@ -21,7 +18,7 @@ public class CommandManager {
         return result;
     }
 
-    public boolean undo() {
+    public boolean undo(Gameplay game, TurnController turnController) {
         if (!undoStack.isEmpty()) {
             PlayerCommand command = undoStack.pop();
             command.undo(game, turnController);
@@ -31,7 +28,7 @@ public class CommandManager {
         return false;
     }
 
-    public boolean redo() {
+    public boolean redo(Gameplay game, TurnController turnController) {
         if (!redoStack.isEmpty()) {
             PlayerCommand command = redoStack.pop();
             command.execute(game, turnController);

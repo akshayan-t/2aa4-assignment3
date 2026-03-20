@@ -57,4 +57,8 @@ public class RollDiceCommand implements PlayerCommand {
 			game.setTurnPhase(TurnPhase.ROLLED);
 		}
 	}
+
+	public int getCost() {
+		return 0;
+	}
 }

@@ -4,19 +4,38 @@ import java.util.Random;
 
 public class BotDecisionPolicy { //Chooses command for computer
     private Random rand = new Random();
+    private BenefitScoringStrategy strategy = new BenefitScoringStrategy();
 
-    public PlayerCommand chooseNextCommand(Gameplay game, TurnController turnController) { //Chooses next command
+    public PlayerCommand chooseNextCommand(Gameplay game, TurnController turnController, CommandManager commandManager) { //Chooses next command
         Board board = game.getBoard();
         Player player = game.getCurrentPlayer();
         List<Player> players = game.getPlayers();
-        int action = -100; //Sets action out of bounds
 
-        List<PlayerCommand> actions = board.checkActions(player, getSettlementNodes(player, board), getRoadNodes(player, board)); //Passes new instances of settlement and road nodes to not alter originals
-        while (actions.size() > 0 && player.getTotalResources() > 7) { //While action can be done
-            action = rand.nextInt(actions.size()); //Chooses random action
-            return actions.get(action);
+        List<PlayerCommand> legalActions = board.getLegalActions(player, getSettlementNodes(player, board), getRoadNodes(player, board)); //Passes new instances of settlement and road nodes to not alter originals
+        PlayerCommand bestMove = null;
+        double maxVal = -1.0;
+        List<PlayerCommand> tiedMoves = new ArrayList<>();
+
+        for (PlayerCommand cmd : legalActions) {
+            double currentVal = strategy.calculateValue(cmd, game, turnController);
+
+            if (currentVal > maxVal) {
+                maxVal = currentVal;
+                bestMove = cmd;
+                tiedMoves.clear();
+                tiedMoves.add(cmd);
+            } else if (currentVal == maxVal) {
+                tiedMoves.add(cmd);
+            }
         }
-        return null; //Returns null if no actions available
+
+        // R3.2: Tie-break with random action
+        if (!tiedMoves.isEmpty()) {
+            PlayerCommand finalChoice = tiedMoves.get(rand.nextInt(tiedMoves.size()));
+            return finalChoice;
+        }
+
+        return bestMove; //Returns null if no actions available
     }
 
     private ArrayList<Node> getSettlementNodes(Player player, Board board) { //Gets settlement nodes from player

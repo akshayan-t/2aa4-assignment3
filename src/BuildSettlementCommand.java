@@ -18,6 +18,7 @@ public class BuildSettlementCommand implements PlayerCommand {
 	private Player player;
 	private HashMap<Player, HashMap<Resource, Integer>> previousPlayerResources = new HashMap<>();
 	private HashMap<Resource, Integer> previousBoardResources = new HashMap<>();
+	private int cost = 4;
 
 	public BuildSettlementCommand(int nodeId) {
 		this.nodeId = nodeId;
@@ -59,5 +60,9 @@ public class BuildSettlementCommand implements PlayerCommand {
 		}
 		HashMap<Resource, Integer> boardResources = previousBoardResources;
 		board.setResources(boardResources);
+	}
+
+	public int getCost() {
+		return cost;
 	}
 }
