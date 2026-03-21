@@ -179,7 +179,7 @@ public class Demonstrator { //Main class
     }
 
     public void testUndo() {
-        System.out.println("Test One");
+        System.out.println("\nTesting Undo/Redo");
         Board board = new Board(); //Makes new board
         Player player1 = new HumanPlayer(1, board); //Makes player for testing
 
@@ -202,8 +202,8 @@ public class Demonstrator { //Main class
 //        main.testTwo();
 //        main.testThree();
 //        main.testFour();
-        main.playGame(); //Game initialized with 1 human player, 3 computer players
+        main.playGame(); //Game initialized with 1 human player, 3 computer players, to change players go to Gameplay constructor
 //        main.testRobber(); //Tests robber robbing someone
-//        main.testUndo();
+        main.testUndo();
     }
 }

@@ -16,7 +16,7 @@ public class Gameplay { //Class for running gameflow
     public Gameplay (int maxTurns) { //Constructor
         this.board = new Board();
         this.maxTurns = maxTurns;
-        Player player1 = new HumanPlayer(1, board, PlayerColour.RED); //Human player
+        Player player1 = new Player(1, board, PlayerColour.RED); //Human player
         Player player2 = new Player(2, board, PlayerColour.BLUE);
         Player player3 = new Player(3, board, PlayerColour.GREEN);
         Player player4 = new Player(4, board, PlayerColour.ORANGE);
