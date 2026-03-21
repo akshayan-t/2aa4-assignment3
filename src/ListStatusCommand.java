@@ -23,6 +23,6 @@ public class ListStatusCommand implements PlayerCommand {
 	public void undo(Gameplay game, TurnController turnController) {}
 
 	public int getCost() {
-		return cost;
+		return 0;
 	}
 }

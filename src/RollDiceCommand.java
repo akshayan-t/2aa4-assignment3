@@ -59,6 +59,6 @@ public class RollDiceCommand implements PlayerCommand {
 	}
 
 	public int getCost() {
-		return cost;
+		return 0;
 	}
 }
